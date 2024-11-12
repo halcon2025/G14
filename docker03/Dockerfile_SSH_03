@@ -1,0 +1,33 @@
+# Usar la imagen base de Ubuntu
+FROM ubuntu:latest
+
+# Actualizar el sistema e instalar OpenSSH Server y sudo
+RUN apt-get update && apt-get install -y openssh-server sudo
+
+# Crear el directorio necesario para SSH
+RUN mkdir /var/run/sshd
+
+# Configurar la contraseña para el usuario root
+RUN echo 'root:password' | chpasswd
+
+# Crear 12 usuarios con contraseñas y agregar al grupo sudo
+RUN for i in $(seq 1 12); do \
+    username="user$i"; \
+    useradd -m -d /home/$username -s /bin/bash $username; \
+    echo "$username:password" | chpasswd; \
+    usermod -aG sudo $username; \
+done
+
+# Permitir la autenticación por contraseña y acceso root
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Configurar para mantener el contenedor activo
+RUN echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config
+RUN echo "ClientAliveCountMax 3" >> /etc/ssh/sshd_config
+
+# Exponer el puerto 22 para SSH
+EXPOSE 22
+
+# Comando para iniciar el servicio SSH
+CMD ["/usr/sbin/sshd", "-D"]
