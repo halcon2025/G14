@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Profesional de Docker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #343a40;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        nav a {
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        nav a:hover {
+            background-color: #007bff;
+            transform: scale(1.1);
+        }
+        .container {
+            padding: 20px;
+        }
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+        }
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bienvenidos al Grupo G14 de AWS con Docker</h1>
+    </header>
+    <nav>
+        <a href="#inicio">Inicio</a>
+        <a href="#sobre-docker">Sobre Docker</a>
+        <a href="#caracteristicas">Características</a>
+        <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="container">
+        <div id="inicio" class="card">
+            <h2>Inicio</h2>
+            <p>Bienvenidos al Grupo G14 de AWS con Docker. Aquí encontrarás toda la información que necesitas sobre Docker, sus características y cómo puede beneficiar tus proyectos.</p>
+        </div>
+        <div id="sobre-docker" class="card">
+            <h2>Sobre Docker</h2>
+            <p>Docker es un conjunto de productos de plataforma como servicio que utilizan virtualización a nivel de sistema operativo para entregar software en paquetes llamados contenedores. Los contenedores están aislados entre sí y agrupan su propio software, bibliotecas y archivos de configuración; pueden comunicarse entre sí a través de canales bien definidos.</p>
+        </div>
+        <div id="caracteristicas" class="card">
+            <h2>Características</h2>
+            <ul>
+                <li>Entorno Consistente</li>
+                <li>Escalabilidad</li>
+                <li>Despliegue Rápido</li>
+                <li>Seguridad</li>
+                <li>Portabilidad</li>
+            </ul>
+        </div>
+        <div id="contacto" class="card">
+            <h2>Contacto</h2>
+            <p>Para más información sobre Docker y nuestros servicios, por favor contáctanos en <a href="mailto:info@dockerpro.com">info@dockerpro.com</a>.</p>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Página Profesional de Docker. Todos los derechos reservados.</p>
+    </footer>
+    <script>
+        // Smooth scrolling for navigation links
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    window.scrollTo({
+                        top: targetElement.offsetTop,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Reveal cards on scroll
+            const cards = document.querySelectorAll('.card');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            });
+
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
