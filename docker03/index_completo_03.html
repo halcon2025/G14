@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Educativo - Grupo G14</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #E0F7FA;
+            color: #005662;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #00796B;
+            padding: 20px;
+            text-align: center;
+            color: #FFF;
+        }
+        header h1, header h2 {
+            margin: 0;
+        }
+        nav {
+            background-color: #004D40;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #FFF;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+        nav a:hover {
+            color: #80CBC4;
+        }
+        main {
+            padding: 20px;
+        }
+        .content-section {
+            background-color: #B2DFDB;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .interactive {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .interactive:hover {
+            background-color: #80CBC4;
+            color: #004D40;
+            transform: scale(1.02);
+        }
+        .button {
+            background-color: #00796B;
+            color: #FFF;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .button:hover {
+            background-color: #004D40;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const interactiveElements = document.querySelectorAll('.interactive');
+            interactiveElements.forEach(element => {
+                element.addEventListener('mouseover', () => {
+                    element.style.transform = 'scale(1.02)';
+                });
+                element.addEventListener('mouseout', () => {
+                    element.style.transform = 'scale(1)';
+                });
+            });
+
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    alert('Botón clickeado');
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Bienvenidos al Grupo G14</h1>
+        <h2>Curso de AWS Nivel Explorador</h2>
+    </header>
+    <nav>
+        <a href="#docker">Docker</a>
+        <a href="#aws">Conceptos de AWS</a>
+    </nav>
+    <main>
+        <section id="docker" class="content-section interactive">
+            <h3>Tema de Hoy: Docker</h3>
+            <p>Docker es una plataforma de contenedores que permite a los desarrolladores empaquetar aplicaciones y todas sus dependencias en un contenedor, que puede ejecutarse en cualquier entorno. Esto garantiza que la aplicación funcione de manera coherente independientemente del sistema operativo o las configuraciones del sistema.</p>
+            <p>Algunas ventajas de Docker incluyen:</p>
+            <ul>
+                <li>Portabilidad: los contenedores pueden ejecutarse en cualquier lugar.</li>
+                <li>Consistencia: las aplicaciones funcionan igual en desarrollo, prueba y producción.</li>
+                <li>Eficiencia: los contenedores son ligeros y utilizan recursos de manera eficiente.</li>
+            </ul>
+        </section>
+        <section id="aws" class="content-section interactive">
+            <h3>Conceptos de AWS</h3>
+            <p>Amazon Web Services (AWS) es una plataforma de servicios en la nube que ofrece una amplia gama de servicios de infraestructura, como potencia de cómputo, almacenamiento, bases de datos y herramientas de administración. Estos son algunos de los servicios más importantes de AWS:</p>
+            <ul>
+                <li><strong>EC2</strong>: Proporciona capacidad de cómputo escalable en la nube.</li>
+                <li><strong>S3</strong>: Servicio de almacenamiento de objetos que permite almacenar y recuperar cualquier cantidad de datos desde cualquier parte del mundo.</li>
+                <li><strong>RDS</strong>: Servicio de base de datos relacional gestionado que facilita la configuración, operación y escalado de bases de datos en la nube.</li>
+                <li><strong>Lambda</strong>: Permite ejecutar código sin aprovisionar ni administrar servidores.</li>
+            </ul>
+            <button class="button">Aprender más</button>
+        </section>
+    </main>
+</body>
+</html>
