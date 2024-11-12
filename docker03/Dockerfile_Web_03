@@ -1,0 +1,10 @@
+# Usar la imagen base de Ubuntu
+FROM ubuntu:latest
+# Actualizar el sistema e instalar Apache
+RUN apt-get update && apt-get install -y apache2
+# Copiar el archivo index.html al contenedor
+COPY ./index.html /var/www/html/index.html
+# Exponer el puerto 80
+EXPOSE 80
+# Comando para ejecutar Apache
+CMD ["apachectl", "-D", "FOREGROUND"]
