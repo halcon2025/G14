@@ -1,0 +1,47 @@
+# Usar la imagen base de Ubuntu
+FROM ubuntu:latest
+
+# Actualizar el sistema e instalar Apache, PostgreSQL y OpenSSH Server
+RUN apt-get update && apt-get install -y apache2 postgresql postgresql-contrib openssh-server sudo
+
+# Configurar PostgreSQL para escuchar en todas las interfaces
+RUN PG_CONF=$(find /etc/postgresql/ -name "postgresql.conf") && \
+    echo "listen_addresses='*'" >> $PG_CONF
+
+# Configurar el archivo pg_hba.conf para permitir conexiones desde cualquier IP
+RUN PG_HBA=$(find /etc/postgresql/ -name "pg_hba.conf") && \
+    echo "host all all 0.0.0.0/0 md5" >> $PG_HBA
+
+# Establecer la contraseña para el usuario postgres
+RUN service postgresql start && \
+    su - postgres -c "psql -c \"ALTER USER postgres WITH PASSWORD 'mi_password_postgres';\"" && \
+    service postgresql stop
+
+# Crear un usuario de PostgreSQL y una base de datos
+RUN service postgresql start && \
+    sleep 5 && \
+    su - postgres -c "psql -c \"CREATE USER mi_usuario WITH PASSWORD 'mi_password';\"" && \
+    su - postgres -c "psql -c \"CREATE DATABASE mi_basededatos;\"" && \
+    su - postgres -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE mi_basededatos TO mi_usuario;\"" && \
+    service postgresql stop
+
+# Configurar SSH y crear usuarios, incluyendo root
+RUN mkdir /var/run/sshd && \
+    echo 'root:password' | chpasswd && \
+    useradd -m -d /home/user1 -s /bin/bash user1 && echo 'user1:password1' | chpasswd && \
+    useradd -m -d /home/user2 -s /bin/bash user2 && echo 'user2:password2' | chpasswd && \
+    echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config && \
+    echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
+
+# Configurar Apache y copiar el archivo index.html
+COPY ./index.html /var/www/html/index.html
+
+# Exponer los puertos necesarios
+EXPOSE 80 5432 22
+
+# Crear un script de inicio para ejecutar todos los servicios
+COPY start-services.sh /start-services.sh
+RUN chmod +x /start-services.sh
+
+# Comando para ejecutar el script de inicio
+CMD ["/start-services.sh"]
