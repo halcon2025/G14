@@ -1,47 +1,33 @@
-# Usar la imagen base de Ubuntu
+# Utilizamos una imagen base de Ubuntu
 FROM ubuntu:latest
 
-# Actualizar el sistema e instalar Apache, PostgreSQL y OpenSSH Server
-RUN apt-get update && apt-get install -y apache2 postgresql postgresql-contrib openssh-server sudo
+# Actualizar paquetes e instalar Apache, PostgreSQL y SSH
+RUN apt-get update && \
+    apt-get install -y apache2 postgresql postgresql-contrib openssh-server sudo && \
+    apt-get clean
 
-# Configurar PostgreSQL para escuchar en todas las interfaces
-RUN PG_CONF=$(find /etc/postgresql/ -name "postgresql.conf") && \
-    echo "listen_addresses='*'" >> $PG_CONF
+# Copiar el archivo index.html a la carpeta de Apache
+COPY index.html /var/www/html/index.html
 
-# Configurar el archivo pg_hba.conf para permitir conexiones desde cualquier IP
-RUN PG_HBA=$(find /etc/postgresql/ -name "pg_hba.conf") && \
-    echo "host all all 0.0.0.0/0 md5" >> $PG_HBA
+# Configurar Apache
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+RUN mkdir -p /var/run/apache2
+EXPOSE 80
 
-# Establecer la contraseña para el usuario postgres
+# Configurar PostgreSQL
 RUN service postgresql start && \
-    su - postgres -c "psql -c \"ALTER USER postgres WITH PASSWORD 'mi_password_postgres';\"" && \
-    service postgresql stop
+    sudo -u postgres psql -c "CREATE USER docker WITH PASSWORD 'docker';" && \
+    sudo -u postgres psql -c "ALTER USER docker WITH SUPERUSER;" && \
+    sudo -u postgres psql -c "CREATE DATABASE docker_db;" && \
+    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE docker_db TO docker;"
+EXPOSE 5432
 
-# Crear un usuario de PostgreSQL y una base de datos
-RUN service postgresql start && \
-    sleep 5 && \
-    su - postgres -c "psql -c \"CREATE USER mi_usuario WITH PASSWORD 'mi_password';\"" && \
-    su - postgres -c "psql -c \"CREATE DATABASE mi_basededatos;\"" && \
-    su - postgres -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE mi_basededatos TO mi_usuario;\"" && \
-    service postgresql stop
+# Configurar SSH
+RUN mkdir /var/run/sshd
+RUN echo 'root:rootpassword' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+EXPOSE 22
 
-# Configurar SSH y crear usuarios, incluyendo root
-RUN mkdir /var/run/sshd && \
-    echo 'root:password' | chpasswd && \
-    useradd -m -d /home/user1 -s /bin/bash user1 && echo 'user1:password1' | chpasswd && \
-    useradd -m -d /home/user2 -s /bin/bash user2 && echo 'user2:password2' | chpasswd && \
-    echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config && \
-    echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
-
-# Configurar Apache y copiar el archivo index.html
-COPY ./index.html /var/www/html/index.html
-
-# Exponer los puertos necesarios
-EXPOSE 80 5432 22
-
-# Crear un script de inicio para ejecutar todos los servicios
-COPY start-services.sh /start-services.sh
-RUN chmod +x /start-services.sh
-
-# Comando para ejecutar el script de inicio
-CMD ["/start-services.sh"]
+# Comando de inicio que arranca Apache, PostgreSQL y SSH en un solo contenedor
+CMD service apache2 start && service postgresql start && service ssh start && tail -F /dev/null
