@@ -1,0 +1,30 @@
+# Usa una imagen base de Debian con Apache y PHP
+FROM php:8.0-apache
+
+# Establece el ServerName para eliminar el aviso
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Instala las extensiones necesarias para PHP y PostgreSQL
+RUN apt-get update && \
+    apt-get install -y libpq-dev && \
+    docker-php-ext-install pgsql pdo_pgsql
+
+# Configura la base de datos PostgreSQL
+RUN apt-get install -y postgresql postgresql-contrib
+
+# Crea un usuario y una base de datos para la aplicación
+RUN service postgresql start && \
+    su postgres -c "psql -c \"CREATE USER app_user WITH PASSWORD 'password';\"" && \
+    su postgres -c "psql -c \"CREATE DATABASE app_db OWNER app_user;\"" && \
+    su postgres -c "psql -d app_db -c \"CREATE TABLE clientes (id SERIAL PRIMARY KEY, nombre VARCHAR(100), email VARCHAR(100));\"" && \
+    su postgres -c "psql -d app_db -c \"GRANT ALL PRIVILEGES ON TABLE clientes TO app_user;\"" && \
+    su postgres -c "psql -d app_db -c \"GRANT ALL PRIVILEGES ON SEQUENCE clientes_id_seq TO app_user;\""
+
+# Copia el archivo index.php al directorio de Apache
+COPY index.php /var/www/html/
+
+# Exponer el puerto 80 para el servidor web
+EXPOSE 80
+
+# Inicia PostgreSQL y Apache cuando se ejecute el contenedor
+CMD service postgresql start && apache2-foreground
