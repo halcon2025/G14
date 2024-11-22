@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-info-config
+  namespace: aws-info
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Explorando AWS</title>
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+                margin: 0;
+                padding: 0;
+                background: linear-gradient(120deg, #232f3e, #3b5998);
+                color: white;
+                text-align: center;
+            }
+            header {
+                background-color: #3b5998;
+                padding: 20px;
+                font-size: 1.5em;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            main {
+                padding: 30px;
+            }
+            button {
+                background-color: #ff9900;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-size: 1em;
+                border-radius: 5px;
+                cursor: pointer;
+                margin: 10px;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+            button:hover {
+                background-color: #232f3e;
+                transform: scale(1.05);
+            }
+            footer {
+                background-color: #232f3e;
+                color: white;
+                padding: 10px;
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+            }
+        </style>
+        <script>
+            function goToAWSService(service) {
+                const urls = {
+                    ec2: 'https://aws.amazon.com/ec2/',
+                    s3: 'https://aws.amazon.com/s3/',
+                    dynamodb: 'https://aws.amazon.com/dynamodb/'
+                };
+                window.open(urls[service], '_blank');
+            }
+        </script>
+    </head>
+    <body>
+        <header>
+            <h1>Explorando Amazon Web Services (AWS)</h1>
+        </header>
+        <main>
+            <p>Amazon Web Services es líder en soluciones de computación en la nube.</p>
+            <p>Selecciona un servicio para aprender más:</p>
+            <button onclick="goToAWSService('ec2')">Amazon EC2</button>
+            <button onclick="goToAWSService('s3')">Amazon S3</button>
+            <button onclick="goToAWSService('dynamodb')">Amazon DynamoDB</button>
+        </main>
+        <footer>
+            &copy; 2024 Explorando AWS - Grupo 14
+        </footer>
+    </body>
+    </html>

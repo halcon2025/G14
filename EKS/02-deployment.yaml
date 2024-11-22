@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-info-app
+  namespace: aws-info
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aws-info
+  template:
+    metadata:
+      labels:
+        app: aws-info
+    spec:
+      containers:
+      - name: aws-info-container
+        image: nginx:latest
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: web-content
+        ports:
+        - containerPort: 80
+      volumes:
+      - name: web-content
+        configMap:
+          name: aws-info-config
