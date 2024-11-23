@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grupo14-app
+  namespace: grupo14
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: grupo14
+  template:
+    metadata:
+      labels:
+        app: grupo14
+    spec:
+      containers:
+      - name: grupo14-container
+        image: nginx:latest
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: web-content
+        ports:
+        - containerPort: 80
+      volumes:
+      - name: web-content
+        configMap:
+          name: web-content-config

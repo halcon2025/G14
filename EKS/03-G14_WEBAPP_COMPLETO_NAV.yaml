@@ -1,0 +1,149 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: grupo14
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-content-config
+  namespace: grupo14
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Grupo 14 - Feliz Navidad en AWS</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Roboto', sans-serif;
+                background: linear-gradient(to bottom, #00416A, #E4E5E6);
+                color: white;
+                text-align: center;
+            }
+            header {
+                background-color: #006994;
+                padding: 20px;
+                color: white;
+                font-size: 2em;
+                text-shadow: 2px 2px #003F5C;
+            }
+            main {
+                margin: 20px auto;
+                padding: 20px;
+                max-width: 800px;
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            }
+            footer {
+                margin-top: 30px;
+                padding: 15px;
+                background-color: #00416A;
+                color: white;
+                font-size: 1em;
+            }
+            button {
+                background-color: #FF5733;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-size: 1.2em;
+                margin: 10px;
+                cursor: pointer;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+            }
+            button:hover {
+                background-color: #C70039;
+                transform: scale(1.1);
+            }
+            .snowflake {
+                color: white;
+                font-size: 1.5em;
+                position: absolute;
+                animation: fall 10s infinite linear;
+            }
+            @keyframes fall {
+                0% { top: -10%; left: random(0, 100)% }
+                100% { top: 110%; left: random(0, 100)% }
+            }
+        </style>
+        <script>
+            function goToAWS() {
+                window.open("https://aws.amazon.com", "_blank");
+            }
+            function generateSnowflakes() {
+                const snowflakeContainer = document.body;
+                for (let i = 0; i < 50; i++) {
+                    const snowflake = document.createElement("div");
+                    snowflake.classList.add("snowflake");
+                    snowflake.textContent = "❄";
+                    snowflake.style.left = Math.random() * 100 + "vw";
+                    snowflake.style.animationDuration = Math.random() * 5 + 5 + "s";
+                    snowflake.style.animationDelay = Math.random() * 3 + "s";
+                    snowflakeContainer.appendChild(snowflake);
+                }
+            }
+            window.onload = generateSnowflakes;
+        </script>
+    </head>
+    <body>
+        <header>🎄 Bienvenidos al Portal del Grupo 14 - Feliz Navidad 🎄</header>
+        <main>
+            <h1>¡Explorando Amazon Web Services (AWS)!</h1>
+            <p>Amazon Web Services es el líder en soluciones de computación en la nube.</p>
+            <p>¡Descubre cómo AWS transforma la tecnología mientras celebramos la magia de la Navidad!</p>
+            <button onclick="goToAWS()">Explorar AWS</button>
+        </main>
+        <footer>
+            &copy; 2024 Grupo 14 - Feliz Navidad en AWS
+        </footer>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grupo14-app
+  namespace: grupo14
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: grupo14
+  template:
+    metadata:
+      labels:
+        app: grupo14
+    spec:
+      containers:
+      - name: grupo14-container
+        image: nginx:latest
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: web-content
+        ports:
+        - containerPort: 80
+      volumes:
+      - name: web-content
+        configMap:
+          name: web-content-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grupo14-service
+  namespace: grupo14
+spec:
+  type: LoadBalancer
+  selector:
+    app: grupo14
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
