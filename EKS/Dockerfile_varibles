@@ -1,0 +1,43 @@
+# Usar Amazon Linux 2023 como base
+FROM amazonlinux:2023
+
+# Actualizar el sistema e instalar Apache, PHP y extensiones necesarias
+RUN dnf update -y && \
+    dnf install -y httpd php php-pgsql php-mbstring php-xml php-json php-fpm php-gd && \
+    dnf clean all
+
+# Configurar Apache para que se ejecute en primer plano
+RUN echo "ServerName localhost" >> /etc/httpd/conf/httpd.conf
+
+# Crear el directorio necesario para el socket de PHP-FPM
+RUN mkdir -p /run/php-fpm && \
+    chown apache:apache /run/php-fpm
+
+# Configurar PHP-FPM para permitir variables de entorno
+RUN sed -i 's/^;clear_env = yes/clear_env = no/' /etc/php-fpm.d/www.conf && \
+    echo "env[DB_HOST] = \$DB_HOST" >> /etc/php-fpm.d/www.conf && \
+    echo "env[DB_NAME] = \$DB_NAME" >> /etc/php-fpm.d/www.conf && \
+    echo "env[DB_USER] = \$DB_USER" >> /etc/php-fpm.d/www.conf && \
+    echo "env[DB_PASSWORD] = \$DB_PASSWORD" >> /etc/php-fpm.d/www.conf
+
+# Asegurar que PHP-FPM esté configurado correctamente
+RUN sed -i 's#^listen = 127.0.0.1:9000#listen = /run/php-fpm/www.sock#' /etc/php-fpm.d/www.conf && \
+    sed -i 's#^;listen.owner = nobody#listen.owner = apache#' /etc/php-fpm.d/www.conf && \
+    sed -i 's#^;listen.group = nobody#listen.group = apache#' /etc/php-fpm.d/www.conf && \
+    sed -i 's#^;listen.mode = 0660#listen.mode = 0660#' /etc/php-fpm.d/www.conf
+
+# Configurar el directorio de trabajo de Apache
+WORKDIR /var/www/html
+
+# Copiar los archivos de la aplicación al directorio de Apache
+COPY . /var/www/html
+
+# Ajustar permisos para Apache y los archivos de la aplicación
+RUN chmod -R 755 /var/www/html && \
+    chown -R apache:apache /var/www/html
+
+# Exponer el puerto estándar de Apache
+EXPOSE 80
+
+# Iniciar PHP-FPM y Apache
+CMD ["/bin/sh", "-c", "php-fpm -D && /usr/sbin/httpd -D FOREGROUND"]
