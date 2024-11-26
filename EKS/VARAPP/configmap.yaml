@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agenda-config
+data:
+  DB_HOST: "<rds-endpoint>"  # Reemplaza con el endpoint de RDS
+  DB_NAME: "agenda_db"

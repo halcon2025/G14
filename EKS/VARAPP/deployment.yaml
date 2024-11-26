@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agenda
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agenda
+  template:
+    metadata:
+      labels:
+        app: agenda
+    spec:
+      containers:
+      - name: agenda
+        image: <account_id>.dkr.ecr.<region>.amazonaws.com/agenda:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: agenda-config
+              key: DB_HOST
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: agenda-config
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: agenda-secrets
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: agenda-secrets
+              key: DB_PASSWORD
